@@ -1,6 +1,6 @@
 /*
 
-The Game Project 5 - Bring it all together
+The Game Project 6 – Adding game mechanics
 
 */
 const Y_AXIS = 1; //used for colour gradient function
@@ -12,15 +12,22 @@ var vel_x; //player velocity - x axis
 var vel_y; //player velocity - y axis
 var scrollPos;
 var gameChar_world_x;
+var game_score;
 
 var isLeft;
 var isRight;
 var isFalling;
 var isPlummeting;
 
-
 function setup()
 {
+    //#############################################################
+    // Initialized the variables, objects and lists (arrays)      #
+    // for all the elements of the game.                          #
+    // These data structures are used to define properties of     #
+    // these game elements                                        #
+    //#############################################################
+
 	createCanvas(1024, 576);
 	floorPos_x = 520
 	gameChar_x = 140;
@@ -41,7 +48,7 @@ function setup()
 	isFalling = false;
 	isPlummeting = false;
 
-	// Initialise arrays of scenery objects.
+	// Initialise arrays of non interactable elements in the game.
 	sky = 
 	{
         color1: color(0, 79, 240),
@@ -115,6 +122,8 @@ function setup()
         { y: 400, w: 16, h: 110, d: 140 },
         { y: 300, w: 20, h: 210, d: 160 },
     ];
+
+    // Initialise arrays of interactable elements in the game.
 	isFound = [false, false, false, false, false, false, false];
     isFound1 = [false, false, false, false, false, false, false];
     collectables_collected = 0;
@@ -150,6 +159,14 @@ function setup()
 
 function draw()
 {
+    //################################################################
+    // Drawing elements in the game and the character                #
+    // Adding logic to the game including gravity, collision         #
+    // and screen scrolling.                                         #
+    // The code for drawing most elements is in their own unique     #
+    // function but all of them are called in this function.         #
+    //################################################################
+
 	// DRAW SKY
 	setGradient(0, 0, 1024, 550, sky.color1, sky.color2, Y_AXIS); // fill the sky blue
 
@@ -173,6 +190,23 @@ function draw()
     noStroke(); 
     fill(ground.grassColor);
     rect(ground.x, ground.y - 10, ground.w, 15);
+
+    // DRAW SCORE BOARD (NO OF COINS COLLECTED)
+    collectables_collected = 0;
+    for (i = 0; i < isFound.length; i++) {
+        if (isFound[i] == true) {
+            collectables_collected++;
+        }
+        if (isFound1[i] == true) {
+            collectables_collected++;
+        }
+    }
+    noStroke();
+    fill(80, 200);
+    rect(10, 10, 160, 40);
+    fill(255);
+    textSize(20);
+    text("Coins: " + collectables_collected + "/14", 25, 35);
 
 	// Adding scrolling mechanism for the elements below
 	push();
