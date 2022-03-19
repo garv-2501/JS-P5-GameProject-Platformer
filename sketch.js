@@ -7,12 +7,13 @@ const Y_AXIS = 1; //used for colour gradient function
 
 var gameChar_x;
 var gameChar_y;
-var floorPos_x;
+var floorPos_y;
 var vel_x; //player velocity - x axis
 var vel_y; //player velocity - y axis
 var scrollPos;
 var gameChar_world_x;
 var game_score;
+var flagpole;
 
 var isLeft;
 var isRight;
@@ -29,9 +30,9 @@ function setup()
     //#############################################################
 
 	createCanvas(1024, 576);
-	floorPos_x = 520
+	floorPos_y = 520
 	gameChar_x = 140;
-	gameChar_y = floorPos_x - 10;
+	gameChar_y = floorPos_y - 10;
 	vel_x = 4;
 	vel_y = 10;
 
@@ -66,7 +67,7 @@ function setup()
         soilColor_2: color(120, 38, 3),
         grassColor: color(86, 217, 0),
         x: 0,
-		y: floorPos_x,
+		y: floorPos_y,
         w: 1024,
         h: 60
     };
@@ -126,7 +127,6 @@ function setup()
     // Initialise arrays of interactable elements in the game.
 	isFound = [false, false, false, false, false, false, false];
     isFound1 = [false, false, false, false, false, false, false];
-    collectables_collected = 0;
     collectable = 
 	{
         color1: color(255, 195, 51), //main color
@@ -155,6 +155,7 @@ function setup()
             h: 80,
         },
     ];
+    flagpole = {isReached: false, x_pos: 800}
 }
 
 function draw()
@@ -192,13 +193,13 @@ function draw()
     rect(ground.x, ground.y - 10, ground.w, 15);
 
     // DRAW SCORE BOARD (NO OF COINS COLLECTED)
-    collectables_collected = 0;
+    game_score = 0;
     for (i = 0; i < isFound.length; i++) {
         if (isFound[i] == true) {
-            collectables_collected++;
+            game_score++;
         }
         if (isFound1[i] == true) {
-            collectables_collected++;
+            game_score++;
         }
     }
     noStroke();
@@ -206,7 +207,7 @@ function draw()
     rect(10, 10, 160, 40);
     fill(255);
     textSize(20);
-    text("Coins: " + collectables_collected + "/14", 25, 35);
+    text("Coins: " + game_score + "/14", 25, 35);
 
 	// Adding scrolling mechanism for the elements below
 	push();
@@ -214,6 +215,10 @@ function draw()
 
 	// DRAW TREES
 	drawTrees();
+    renderFlagpole();
+    if (flagpole.isReached == false) {
+        checkFlagpole();
+    }
 
 	// DRAW CANYONS
 	for (i = 1; i < 3; i++) {
@@ -752,6 +757,7 @@ function drawMountains() {
         );
         rect(10, 390, 1000, 200);
     }
+
     fill(200); // ice on mountains
     triangle(260, 230, 192, 273, 316, 275);
     triangle(560, 310, 530, 334, 598, 338);
@@ -807,7 +813,7 @@ function checkCanyon(x, y, t_canyon_x) {
 }
 
 // ----------------------------------
-// Collectable items render and check functions
+// Collectable items, flagpole render and check functions
 // ----------------------------------
 
 // Function to draw collectable objects.
@@ -828,9 +834,34 @@ function checkCollectables(x, y, Cx, Cy) {
         isFound[i] = true
     }
 }
-
 function checkCollectables1(x, y, Cx, Cy) {
     if (dist(x, y, Cx, Cy) < 30) {
         isFound1[i] = true
+    }
+}
+
+// Function to draw Flagpole
+function renderFlagpole() {
+    fill(195)
+    rect(flagpole.x_pos - 40, floorPos_y - 30, 80, 20)
+    rect(flagpole.x_pos - 10, floorPos_y - 170, 20, 140)
+    rect()
+    fill(140)
+    rect(flagpole.x_pos +10, floorPos_y - 30, 30, 20)
+    rect(flagpole.x_pos, floorPos_y - 170, 10, 140)
+    if (flagpole.isReached) {
+        fill(200, 0, 0)
+        triangle(flagpole.x_pos -10, floorPos_y - 70, flagpole.x_pos - 50, floorPos_y - 40, flagpole.x_pos - 10, floorPos_y - 30)
+    } else {
+        fill(200, 0, 0)
+        triangle(flagpole.x_pos -10, floorPos_y - 170, flagpole.x_pos - 50, floorPos_y - 140, flagpole.x_pos - 10, floorPos_y - 130)
+    }
+}
+
+// Function to check if the flagpole has been closed
+function checkFlagpole() {
+    d = dist(gameChar_x, gameChar_y, flagpole.x_pos, floorPos_y)
+    if (d<40) {
+        flagpole.isReached = true;
     }
 }
