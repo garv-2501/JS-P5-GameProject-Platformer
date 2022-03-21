@@ -14,6 +14,7 @@ var scrollPos;
 var gameChar_world_x;
 var game_score;
 var flagpole;
+var lives;
 
 var isLeft;
 var isRight;
@@ -30,132 +31,11 @@ function setup()
     //#############################################################
 
 	createCanvas(1024, 576);
-	floorPos_y = 520
-	gameChar_x = 140;
-	gameChar_y = floorPos_y - 10;
-	vel_x = 4;
-	vel_y = 10;
+	floorPos_y = 520;
+    lives = 3;
 
-	// Variable to control the background scrolling.
-	scrollPos = 0;
-
-	// Variable to store the real position of the gameChar in the game
-	// world. Needed for collision detection.
-	gameChar_world_x = gameChar_x - scrollPos;
-
-	// Boolean variables to control the movement of the game character.
-	isLeft = false;
-	isRight = false;
-	isFalling = false;
-	isPlummeting = false;
-
-	// Initialise arrays of non interactable elements in the game.
-	sky = 
-	{
-        color1: color(0, 79, 240),
-        color2: color(214, 243, 255),
-    };
-	clouds = 
-	[
-        { x: 80, y: 150, w: 100, color: color(200) },
-        { x: 400, y: 100, w: 50, color: color(190) },
-        { x: 700, y: 130, w: 100, color: color(190) },
-    ];
-	ground = 
-	{
-        soilColor_1: color(240, 150, 70),
-        soilColor_2: color(120, 38, 3),
-        grassColor: color(86, 217, 0),
-        x: 0,
-		y: floorPos_y,
-        w: 1024,
-        h: 60
-    };
-	mountains = 
-	[
-        {
-            x1: -100,
-            y1: 560,
-            x2: 100,
-            y2: 250,
-            x3: 400,
-            y3: 540,
-            color: color(0, 137, 196, 50),
-        }, //background mountains
-
-        {
-            x1: -300,
-            y1: 590,
-            x2: 260,
-            y2: 230,
-            x3: 460,
-            y3: 390,
-        }, //foreground mountain 1
-
-        {
-            x1: 460,
-            y1: 390,
-            x2: 560,
-            y2: 310,
-            x3: 660,
-            y3: 390,
-        }, //foreground mountain 2
-
-        {
-            x1: 600,
-            y1: 490,
-            x2: 850,
-            y2: 150,
-            x3: 1100,
-            y3: 530,
-        }, //foreground mountain 3
-    ];
-	trees_x = [650, 780, 900];
-    trees = 
-	[
-        {
-            woodColor: color(151, 84, 69),
-            greenColor_1: color(0, 200, 0),
-            greenColor_2: color(0, 180, 0),
-        },
-		//x values are in trees_x above
-        { y: 300, w: 20, h: 210, d: 180 }, 
-        { y: 400, w: 16, h: 110, d: 140 },
-        { y: 300, w: 20, h: 210, d: 160 },
-    ];
-
-    // Initialise arrays of interactable elements in the game.
-	isFound = [false, false, false, false, false, false, false];
-    isFound1 = [false, false, false, false, false, false, false];
-    collectable = 
-	{
-        color1: color(255, 195, 51), //main color
-        color2: color(208, 105, 1), //back color
-        x: 500,
-        y: 480,
-        w: 26,
-    };
-	canyons = 
-	[
-        {
-            color1: color(120),
-            color2: color(20),
-            color_spikes: color(190),
-        },
-        {
-            x: 220,
-            y: 510,
-            w: 180,
-            h: 80,
-        },
-        {
-            x: 430,
-            y: 510,
-            w: 180,
-            h: 80,
-        },
-    ];
-    flagpole = {isReached: false, x_pos: 800}
+    startGame();
+	
 }
 
 function draw()
@@ -258,6 +138,27 @@ function draw()
 	// DRAW GAME CHARACTER
 	drawGameChar();
 
+    //"Game over" and "Level complete" text
+    if (lives == 0) {
+        fill(0, 100)
+        rect(0, 0, width, height)
+        fill(200, 0, 0);
+        stroke(200, 0, 0)
+        textSize(50);
+        text("Game over. ", 370, 270);
+        text("Press space to continue.", 230, 350)
+    } else {
+        if (flagpole.isReached == true) {
+            fill(0, 100)
+            rect(0, 0, width, height)
+            fill(0, 200, 0);
+            stroke(0, 200, 0)
+            textSize(50);
+            text("Level complete. ", 330, 270);
+            text("Press space to continue.", 230, 350)
+        }
+    }
+
 	// Logic to make the game character move or the background scroll.
 	if (isLeft) {
         // scrolling mechanism
@@ -300,6 +201,16 @@ function draw()
 
 	// Update real position of gameChar for collision detection.
 	gameChar_world_x = gameChar_x - scrollPos;
+
+    //Check if the player has died
+    checkPlayerDie();
+    noStroke();
+    fill(80, 200);
+    rect(855, 10, 160, 40);
+    fill(255);
+    textSize(20);
+    text("Lives: " + lives, 865, 35);
+
 }
 
 
@@ -863,5 +774,150 @@ function checkFlagpole() {
     d = dist(gameChar_x, gameChar_y, flagpole.x_pos, floorPos_y)
     if (d<40) {
         flagpole.isReached = true;
+    }
+}
+
+// ----------------------------------
+// Player lives functions
+// ----------------------------------
+function startGame() {
+    gameChar_x = 140;
+	gameChar_y = floorPos_y - 10;
+	vel_x = 4;
+	vel_y = 10;
+    
+
+	// Variable to control the background scrolling.
+	scrollPos = 0;
+
+	// Variable to store the real position of the gameChar in the game
+	// world. Needed for collision detection.
+	gameChar_world_x = gameChar_x - scrollPos;
+
+	// Boolean variables to control the movement of the game character.
+	isLeft = false;
+	isRight = false;
+	isFalling = false;
+	isPlummeting = false;
+
+	// Initialise arrays of non interactable elements in the game.
+	sky = 
+	{
+        color1: color(0, 79, 240),
+        color2: color(214, 243, 255),
+    };
+	clouds = 
+	[
+        { x: 80, y: 150, w: 100, color: color(200) },
+        { x: 400, y: 100, w: 50, color: color(190) },
+        { x: 700, y: 130, w: 100, color: color(190) },
+    ];
+	ground = 
+	{
+        soilColor_1: color(240, 150, 70),
+        soilColor_2: color(120, 38, 3),
+        grassColor: color(86, 217, 0),
+        x: 0,
+		y: floorPos_y,
+        w: 1024,
+        h: 60
+    };
+	mountains = 
+	[
+        {
+            x1: -100,
+            y1: 560,
+            x2: 100,
+            y2: 250,
+            x3: 400,
+            y3: 540,
+            color: color(0, 137, 196, 50),
+        }, //background mountains
+
+        {
+            x1: -300,
+            y1: 590,
+            x2: 260,
+            y2: 230,
+            x3: 460,
+            y3: 390,
+        }, //foreground mountain 1
+
+        {
+            x1: 460,
+            y1: 390,
+            x2: 560,
+            y2: 310,
+            x3: 660,
+            y3: 390,
+        }, //foreground mountain 2
+
+        {
+            x1: 600,
+            y1: 490,
+            x2: 850,
+            y2: 150,
+            x3: 1100,
+            y3: 530,
+        }, //foreground mountain 3
+    ];
+	trees_x = [650, 780, 900];
+    trees = 
+	[
+        {
+            woodColor: color(151, 84, 69),
+            greenColor_1: color(0, 200, 0),
+            greenColor_2: color(0, 180, 0),
+        },
+		//x values are in trees_x above
+        { y: 300, w: 20, h: 210, d: 180 }, 
+        { y: 400, w: 16, h: 110, d: 140 },
+        { y: 300, w: 20, h: 210, d: 160 },
+    ];
+
+    // Initialise arrays of interactable elements in the game.
+	isFound = [false, false, false, false, false, false, false];
+    isFound1 = [false, false, false, false, false, false, false];
+    collectable = 
+	{
+        color1: color(255, 195, 51), //main color
+        color2: color(208, 105, 1), //back color
+        x: 500,
+        y: 480,
+        w: 26,
+    };
+	canyons = 
+	[
+        {
+            color1: color(120),
+            color2: color(20),
+            color_spikes: color(190),
+        },
+        {
+            x: 220,
+            y: 510,
+            w: 180,
+            h: 80,
+        },
+        {
+            x: 430,
+            y: 510,
+            w: 180,
+            h: 80,
+        },
+    ];
+    flagpole = {isReached: false, x_pos: 800}
+}
+
+// Function to check if player has died
+function checkPlayerDie() {
+    if (isPlummeting == true) {
+        lives -= 1
+        if (lives > 0) {
+            startGame();
+        } else {
+            lives = "0"
+
+        }
     }
 }
