@@ -1,8 +1,6 @@
-/*
 
-The Game Project 6 – Adding game mechanics
 
-*/
+
 const Y_AXIS = 1; //used for colour gradient function
 
 var gameChar_x;
@@ -11,10 +9,11 @@ var floorPos_y;
 var vel_x; //player velocity - x axis
 var vel_y; //player velocity - y axis
 var scrollPos;
-var gameChar_world_x;
+var gameChar_world_x; //stores the xpos of game Character even when scrolling
 var game_score;
 var flagpole;
 var lives;
+var tempLives; //a temporary value used for lives
 
 var isLeft;
 var isRight;
@@ -23,41 +22,35 @@ var isPlummeting;
 
 function setup()
 {
-    //#############################################################
-    // Initialized the variables, objects and lists (arrays)      #
-    // for all the elements of the game.                          #
-    // These data structures are used to define properties of     #
-    // these game elements                                        #
-    //#############################################################
-
 	createCanvas(1024, 576);
-	floorPos_y = 520;
-    lives = 3;
+	floorPos_y = 520; //yPos of the top of the ground
+    lives = 3; //stores the number of lives the player has
 
-    startGame();
-	
+    startGame(); //contains all the arrays and objects that define all game elements
 }
 
 function draw()
 {
     //################################################################
-    // Drawing elements in the game and the character                #
-    // Adding logic to the game including gravity, collision         #
-    // and screen scrolling.                                         #
-    // The code for drawing most elements is in their own unique     #
-    // function but all of them are called in this function.         #
+    // CODE SUMMARY FOR DRAW() FUNCTION:                             #
+    // 1: Drawing game elements and the character                    #
+    // 2: Adding a score board (NO.OF COINS COLLECTED), line=~70     #
+    // 4: Adding screen scrolling to the game                        #
+    // 3: Adding movement to the Game Character (left, right, jump)  #
+    // 5: Adding "GameOver" and "LevelComplete" logic                #
+    // 6: Display no.of lives remaining                              #
     //################################################################
 
-	// DRAW SKY
+	// Drawing the Sky
 	setGradient(0, 0, 1024, 550, sky.color1, sky.color2, Y_AXIS); // fill the sky blue
 
-	// DRAW CLOUDS
+	// Drawing the Clouds
 	drawClouds();
 
-	// DRAW MOUNTAIN
+	// Drawing the Mountains
 	drawMountains();
 
-	// DRAW GROUND
+	// Drawing the Ground
 	noStroke(); 
     setGradient(
         ground.x,
@@ -72,7 +65,7 @@ function draw()
     fill(ground.grassColor);
     rect(ground.x, ground.y - 10, ground.w, 15);
 
-    // DRAW SCORE BOARD (NO OF COINS COLLECTED)
+    // Drawing the Score Board (NO.OF COINS COLLECTED)
     game_score = 0;
     for (i = 0; i < isFound.length; i++) {
         if (isFound[i] == true) {
@@ -93,14 +86,14 @@ function draw()
 	push();
     translate(scrollPos, 0);
 
-	// DRAW TREES
+	// Drawing the Trees
 	drawTrees();
     renderFlagpole();
     if (flagpole.isReached == false) {
         checkFlagpole();
     }
 
-	// DRAW CANYONS
+	// Drawing the Canyon
 	for (i = 1; i < 3; i++) {
         drawCanyon(canyons[i].x,
             canyons[i].y,
@@ -115,7 +108,7 @@ function draw()
 		checkCanyon(gameChar_world_x, gameChar_y, canyons[i].x)
 	} 
 
-	// DRAW COLLECTABLE ITEMS
+	// Drawing the Collectable Items (COINS)
 	collectable.x = 260; //First line of collectable coins
     collectable.y = 400;
     for (i = 0; i < 7; i++) {
@@ -135,31 +128,10 @@ function draw()
 	//Stop the scroll mechanism
 	pop();
 
-	// DRAW GAME CHARACTER
+	// Drawing the Game Character
 	drawGameChar();
 
-    //"Game over" and "Level complete" text
-    if (lives == 0) {
-        fill(0, 100)
-        rect(0, 0, width, height)
-        fill(200, 0, 0);
-        stroke(200, 0, 0)
-        textSize(50);
-        text("Game over. ", 370, 270);
-        text("Press space to continue.", 230, 350)
-    } else {
-        if (flagpole.isReached == true) {
-            fill(0, 100)
-            rect(0, 0, width, height)
-            fill(0, 200, 0);
-            stroke(0, 200, 0)
-            textSize(50);
-            text("Level complete. ", 330, 270);
-            text("Press space to continue.", 230, 350)
-        }
-    }
-
-	// Logic to make the game character move or the background scroll.
+	// Logic to make the game character move and for the background scroll.
 	if (isLeft) {
         // scrolling mechanism
         if (gameChar_x < 140) {
@@ -202,22 +174,66 @@ function draw()
 	// Update real position of gameChar for collision detection.
 	gameChar_world_x = gameChar_x - scrollPos;
 
-    //Check if the player has died
+    //"Game over", "Lives left" and "Level complete" text
+    if (lives == 0) {
+        fill(0, 100)
+        rect(0, 0, width, height)
+        fill(200, 0, 0);
+        stroke(200, 0, 0)
+        textSize(50);
+        text("Game over. You Lose! ", 250, 270);
+        text("Press space to continue.", 230, 350)
+    }else if (isPlummeting) {
+        if (lives > -3 && lives < 3) {
+            fill(0, 100)
+            rect(0, 0, width, height)
+            fill(200, 0, 0);
+            stroke(200, 0, 0)
+            textSize(50);
+            text("Lives left: " + abs(lives), 370, 270);
+            text("Press enter to continue.", 230, 350)
+        }
+    }else if (flagpole.isReached == true && game_score == 14) {
+        fill(0, 100)
+        rect(0, 0, width, height)
+        fill(0, 200, 0);
+        stroke(0, 200, 0)
+        textSize(50);
+        text("Level complete. ", 330, 270);
+        text("Press space to continue.", 230, 350)
+        isFalling = false
+        isLeft = false
+        isRight = false
+    }
+
+    // Display no.of lives remaining
     checkPlayerDie();
     noStroke();
     fill(80, 200);
     rect(855, 10, 160, 40);
     fill(255);
     textSize(20);
-    text("Lives: " + lives, 865, 35);
+    text("Lives: " + abs(lives), 865, 35);
 
 }
+
+
+//############################################################################
+// SUMMARY FOR FUNCTIONS:                                                    #
+// 1: Key control functions                                                  #
+// 2: Color gradient function                                                #
+// 3: Game character render function                                         #
+// 4: Background render functions, (clouds, mountains, trees)                #
+// 5: Canyon render and check functions                                      #
+// 6: Collectable items render and check functions                           #
+// 7: Function that holds all the arrays and objects for all game elements   #
+// 8: Function to check if player has died                                   #
+//############################################################################
 
 
 // ---------------------
 // Key control functions
 // ---------------------
-
 function keyPressed() 
 {
     if (keyCode == LEFT_ARROW) {
@@ -232,8 +248,29 @@ function keyPressed()
     } else if (keyCode == 32) {
         isFalling = true;
     }
-}
 
+    if (isPlummeting == true) {
+        if (lives>-3 && lives < 3 && lives != 0) {
+            if (keyCode == ENTER) {
+                lives = abs(lives)
+                startGame()
+            }
+        }
+        if (lives == 0) {
+            if (keyCode == 32) {
+                lives = 3
+                startGame()
+            }
+        }
+    }
+
+    if (flagpole.isReached == true && game_score == 14) {
+        if (keyCode == 32) {
+            lives = 3
+            startGame()
+        }
+    }
+}
 function keyReleased() 
 {
     if (keyCode == LEFT_ARROW) {
@@ -245,11 +282,27 @@ function keyReleased()
 }
 
 
+// -----------------------------------
+// Function to create a color gradient
+// -----------------------------------
+function setGradient(x, y, w, h, c1, c2, axis) {
+    noFill(); //function used to produce the color gradient
+
+    if (axis === Y_AXIS) {
+        // Top to bottom gradient
+        for (let i = y; i <= y + h; i++) {
+            let inter = map(i, y, y + h, 0, 1);
+            let c = lerpColor(c1, c2, inter);
+            stroke(c);
+            line(x, i, x + w, i);
+        }
+    }
+}
+
+
 // ------------------------------
 // Game character render function
 // ------------------------------
-
-// Function to draw the game character.
 function drawGameChar() 
 {
     if (isLeft && isFalling) {
@@ -590,25 +643,10 @@ function drawGameChar()
     }
 }
 
+
 // ---------------------------
 // Background render functions
 // ---------------------------
-
-// Function to create a color gradient
-function setGradient(x, y, w, h, c1, c2, axis) {
-    noFill(); //function used to produce the color gradient
-
-    if (axis === Y_AXIS) {
-        // Top to bottom gradient
-        for (let i = y; i <= y + h; i++) {
-            let inter = map(i, y, y + h, 0, 1);
-            let c = lerpColor(c1, c2, inter);
-            stroke(c);
-            line(x, i, x + w, i);
-        }
-    }
-}
-
 // Function to draw cloud objects.
 function drawClouds() {
     for (i = 0; i < clouds.length; i++) {
@@ -630,7 +668,6 @@ function drawClouds() {
     }
     
 }
-
 // Function to draw mountains objects.
 function drawMountains() {
     noStroke();//background mountains
@@ -674,7 +711,6 @@ function drawMountains() {
     triangle(560, 310, 530, 334, 598, 338);
     triangle(850, 150, 784, 238, 905, 232);
 }
-
 // Function to draw trees objects.
 function drawTrees() {
     for (i = 0; i < trees_x.length; i++) {
@@ -689,10 +725,10 @@ function drawTrees() {
     }
 }
 
+
 // ---------------------------------
 // Canyon render and check functions
 // ---------------------------------
-
 // Function to draw canyon objects.
 function drawCanyon(x, y, w, h, c1, c2) {
     setGradient(
@@ -706,9 +742,7 @@ function drawCanyon(x, y, w, h, c1, c2) {
         triangle(j, 576, j + 15, 560, j + 30, 576);
     }
 }
-
 // Function to check character is over a canyon.
-
 function checkCanyon(x, y, t_canyon_x) {
 	if (
         (x > t_canyon_x + 5 && x < t_canyon_x + 170)
@@ -723,10 +757,10 @@ function checkCanyon(x, y, t_canyon_x) {
     }
 }
 
-// ----------------------------------
-// Collectable items, flagpole render and check functions
-// ----------------------------------
 
+// ----------------------------------
+// Collectable items render and check functions
+// ----------------------------------
 // Function to draw collectable objects.
 function drawCollectables(f, x, y, w, c1, c2) {
     if (f == false) {
@@ -738,7 +772,6 @@ function drawCollectables(f, x, y, w, c1, c2) {
         ellipse(x - 4, y - 4, 10);
     }
 }
-
 // Function to check character has collected an item.
 function checkCollectables(x, y, Cx, Cy) {
     if (dist(x, y, Cx, Cy) < 30) {
@@ -751,6 +784,10 @@ function checkCollectables1(x, y, Cx, Cy) {
     }
 }
 
+
+// ----------------------------------
+// Flagpole render and check functions
+// ----------------------------------
 // Function to draw Flagpole
 function renderFlagpole() {
     fill(195)
@@ -760,7 +797,7 @@ function renderFlagpole() {
     fill(140)
     rect(flagpole.x_pos +10, floorPos_y - 30, 30, 20)
     rect(flagpole.x_pos, floorPos_y - 170, 10, 140)
-    if (flagpole.isReached) {
+    if (flagpole.isReached && game_score == 14) {
         fill(200, 0, 0)
         triangle(flagpole.x_pos -10, floorPos_y - 70, flagpole.x_pos - 50, floorPos_y - 40, flagpole.x_pos - 10, floorPos_y - 30)
     } else {
@@ -768,18 +805,15 @@ function renderFlagpole() {
         triangle(flagpole.x_pos -10, floorPos_y - 170, flagpole.x_pos - 50, floorPos_y - 140, flagpole.x_pos - 10, floorPos_y - 130)
     }
 }
-
 // Function to check if the flagpole has been closed
 function checkFlagpole() {
-    d = dist(gameChar_x, gameChar_y, flagpole.x_pos, floorPos_y)
+    d = dist(gameChar_world_x, gameChar_y, flagpole.x_pos, floorPos_y)
     if (d<40) {
         flagpole.isReached = true;
     }
 }
 
-// ----------------------------------
-// Player lives functions
-// ----------------------------------
+//Function that holds all the arrays and objects for all game elements
 function startGame() {
     gameChar_x = 140;
 	gameChar_y = floorPos_y - 10;
@@ -906,18 +940,18 @@ function startGame() {
             h: 80,
         },
     ];
-    flagpole = {isReached: false, x_pos: 800}
+    flagpole = {isReached: false, x_pos: 2000}
 }
 
 // Function to check if player has died
 function checkPlayerDie() {
     if (isPlummeting == true) {
-        lives -= 1
-        if (lives > 0) {
-            startGame();
-        } else {
-            lives = "0"
-
+        if (lives == 3) {
+            lives = -2
+        } else if (lives == 2) {
+            lives = -1
+        } else if (lives == 1) {
+            lives = -0
         }
     }
 }
