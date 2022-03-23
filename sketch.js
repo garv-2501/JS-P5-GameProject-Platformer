@@ -4,6 +4,7 @@
 const Y_AXIS = 1; //used for colour gradient function
 var chocoFont; //Font used globally
 var jumpSound; //Sound used during jump
+var backgroundMusic; //The game background music
 
 var gameChar_x;
 var gameChar_y;
@@ -23,16 +24,21 @@ var isFalling;
 var isPlummeting;
 
 
-// function preload()
-// {
-//     soundFormats('mp3','wav');
+ function preload()
+ {
+     soundFormats('mp3','wav');
     
-//     //load your sounds here
-//     jumpSound = loadSound('assets/jump.wav');
-//     jumpSound.setVolume(0.1);
-    
-//     chocoFont = loadFont('assets/ChocoDonut.ttf')
-// }
+     //loading jump sound effect
+     jumpSound = loadSound('assets/Cartoon_jump_by_Bastianhallo_from_pixabay.com');
+     jumpSound.setVolume(0.1);
+     
+     //loading background music
+     backgroundMusic = loadSound('assets/piano_moment_by_ZakharValaha_from_Pixabay.com')
+     backgroundMusic.setVolume(0.1)
+     
+     //loading main game font
+     chocoFont = loadFont('assets/ChocoDonut.ttf')
+ }
 
 function setup()
 {
@@ -48,12 +54,15 @@ function draw()
     //################################################################
     // CODE SUMMARY FOR DRAW() FUNCTION:                             #
     // 1: Drawing game elements and the character                    #
-    // 2: Adding a score board (NO.OF COINS COLLECTED), line=~70     #
     // 4: Adding screen scrolling to the game                        #
     // 3: Adding movement to the Game Character (left, right, jump)  #
     // 5: Adding "GameOver" and "LevelComplete" logic                #
+    // 2: Adding a score board (NO.OF COINS COLLECTED)               #
     // 6: Display no.of lives remaining                              #
     //################################################################
+    
+    //Font that will be used universally
+    textFont(chocoFont)
 
 	// Drawing the Sky
 	setGradient(0, 0, 1024, 550, sky.color1, sky.color2, Y_AXIS); // fill the sky blue
@@ -78,23 +87,6 @@ function draw()
     noStroke(); 
     fill(ground.grassColor);
     rect(ground.x, ground.y - 10, ground.w, 15);
-
-    // Drawing the Score Board (NO.OF COINS COLLECTED)
-    game_score = 0;
-    for (i = 0; i < isFound.length; i++) {
-        if (isFound[i] == true) {
-            game_score++;
-        }
-        if (isFound1[i] == true) {
-            game_score++;
-        }
-    }
-    noStroke();
-    fill(80, 200);
-    rect(10, 10, 160, 40);
-    fill(255);
-    textSize(20);
-    text("Coins: " + game_score + "/14", 25, 35);
 
 	// Adding scrolling mechanism for the elements below
 	push();
@@ -129,7 +121,6 @@ function draw()
         drawCollectables(isFound[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2);
         checkCollectables(gameChar_world_x, gameChar_y, collectable.x, collectable.y)
         collectable.x += 50;
-        
     }
     collectable.x = 1300; //Second line of collectable coins
     collectable.y = 330;
@@ -192,33 +183,50 @@ function draw()
     if (lives == 0) {
         fill(0, 100)
         rect(0, 0, width, height)
-        fill(200, 0, 0);
-        stroke(200, 0, 0)
-        textSize(50);
-        text("Game over. You Lose! ", 250, 270);
-        text("Press space to continue.", 230, 350)
+        fill(250, 0, 0);
+        noStroke()
+        textSize(60);
+        text("Game over. You Lose! ", 265, 270);
+        text("Press space to continue.", 250, 350)
     }else if (isPlummeting) {
         if (lives > -3 && lives < 3) {
             fill(0, 100)
             rect(0, 0, width, height)
-            fill(200, 0, 0);
+            fill(250, 0, 0);
             noStroke()
-            textSize(50);
-            text("Lives left: " + abs(lives), 370, 270);
-            text("Press enter to continue.", 230, 350)
+            textSize(60);
+            text("Lives left: " + abs(lives), 375, 270);
+            text("Press enter to continue.", 245, 350)
         }
     }else if (flagpole.isReached == true) {
         fill(0, 100)
         rect(0, 0, width, height)
-        fill(0, 200, 0);
-        stroke(0, 200, 0)
-        textSize(50);
-        text("Level complete. ", 330, 270);
-        text("Press space to continue.", 230, 350)
+        fill(0, 250, 0);
+        noStroke()
+        textSize(60);
+        text("Level complete. ", 340, 270);
+        text("Press space to continue.", 255, 350)
         isFalling = false
         isLeft = false
         isRight = false
     }
+    
+    // Drawing the Score Board (NO.OF COINS COLLECTED)
+    game_score = 0;
+    for (i = 0; i < isFound.length; i++) {
+        if (isFound[i] == true) {
+            game_score++;
+        }
+        if (isFound1[i] == true) {
+            game_score++;
+        }
+    }
+    noStroke();
+    fill(80, 200);
+    rect(10, 10, 160, 40);
+    fill(255);
+    textSize(25);
+    text("Coins: " + game_score + "/14", 25, 39);
 
     // Display no.of lives remaining
     checkPlayerDie();
@@ -226,8 +234,8 @@ function draw()
     fill(80, 200);
     rect(855, 10, 160, 40);
     fill(255);
-    textSize(20);
-    text("Lives: " + abs(lives), 865, 35);
+    textSize(25);
+    text("Lives: " + abs(lives), 870, 39);
 
 }
 
