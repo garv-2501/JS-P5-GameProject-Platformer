@@ -193,7 +193,7 @@ function draw()
             text("Lives left: " + abs(lives), 370, 270);
             text("Press enter to continue.", 230, 350)
         }
-    }else if (flagpole.isReached == true && game_score == 14) {
+    }else if (flagpole.isReached == true) {
         fill(0, 100)
         rect(0, 0, width, height)
         fill(0, 200, 0);
@@ -808,8 +808,9 @@ function renderFlagpole() {
 // Function to check if the flagpole has been closed
 function checkFlagpole() {
     d = dist(gameChar_world_x, gameChar_y, flagpole.x_pos, floorPos_y)
-    if (d<40) {
+    if (d<40 && game_score ==14) {
         flagpole.isReached = true;
+        console.log(flagpole.isReached)
     }
 }
 
