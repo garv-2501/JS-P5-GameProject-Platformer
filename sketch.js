@@ -53,12 +53,13 @@ function draw()
 {
     //################################################################
     // CODE SUMMARY FOR DRAW() FUNCTION:                             #
-    // 1: Drawing game elements and the character                    #
-    // 4: Adding screen scrolling to the game                        #
-    // 3: Adding movement to the Game Character (left, right, jump)  #
+    // 1: Set universal font                                         #
+    // 2: Drawing game elements and the character                    #
+    // 3: Adding screen scrolling to the game                        #
+    // 4: Adding movement to the Game Character (left, right, jump)  #
     // 5: Adding "GameOver" and "LevelComplete" logic                #
-    // 2: Adding a score board (NO.OF COINS COLLECTED)               #
-    // 6: Display no.of lives remaining                              #
+    // 6: Adding a score board (NO.OF COINS COLLECTED)               #
+    // 7: Display no.of lives remaining                              #
     //################################################################
     
     //Font that will be used universally
@@ -129,6 +130,10 @@ function draw()
         checkCollectables1(gameChar_world_x, gameChar_y, collectable.x, collectable.y)
         collectable.x += 50
     }
+
+    // Drawing goLeft and goRight boards
+    goLeft(flagpole.x_pos + 300)
+    goRight(-150)
 
 	//Stop the scroll mechanism
 	pop();
@@ -236,6 +241,7 @@ function draw()
     fill(255);
     textSize(25);
     text("Lives: " + abs(lives), 870, 39);
+
 
 }
 
@@ -977,4 +983,44 @@ function checkPlayerDie() {
             lives = -0
         }
     }
+}
+
+// ---------------------------
+// Mark playing area functions
+// ---------------------------
+
+function goLeft(x) {
+    var y = 430
+    fill(200, 80, 80)
+    noStroke()
+    rect(x, y, 20, floorPos_y - y-10)
+    rect(x -60, y - 50, 140, 60)
+    fill(140, 40, 40)
+    rect(x+13, y +7, 10, floorPos_y - y-20)
+    rect(x + 80, y - 50, 10, 60)
+
+
+    textSize(25)
+    fill(200)
+    text("Go Left", x-23, y-27)
+    textSize(30)
+    text("<--", x-8, y-2)
+}
+
+function goRight(x) {
+    var y = 430
+    fill(200, 80, 80)
+    noStroke()
+    rect(x, y, 20, floorPos_y - y-10)
+    rect(x -60, y - 50, 140, 60)
+    fill(140, 40, 40)
+    rect(x+13, y +7, 10, floorPos_y - y-20)
+    rect(x + 80, y - 50, 10, 60)
+
+
+    textSize(25)
+    fill(200)
+    text("Go Right", x-23, y-27)
+    textSize(30)
+    text("-->", x-8, y-2)
 }
