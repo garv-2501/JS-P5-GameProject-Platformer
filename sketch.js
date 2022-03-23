@@ -2,6 +2,8 @@
 
 
 const Y_AXIS = 1; //used for colour gradient function
+var chocoFont; //Font used globally
+var jumpSound; //Sound used during jump
 
 var gameChar_x;
 var gameChar_y;
@@ -19,6 +21,18 @@ var isLeft;
 var isRight;
 var isFalling;
 var isPlummeting;
+
+
+// function preload()
+// {
+//     soundFormats('mp3','wav');
+    
+//     //load your sounds here
+//     jumpSound = loadSound('assets/jump.wav');
+//     jumpSound.setVolume(0.1);
+    
+//     chocoFont = loadFont('assets/ChocoDonut.ttf')
+// }
 
 function setup()
 {
@@ -188,7 +202,7 @@ function draw()
             fill(0, 100)
             rect(0, 0, width, height)
             fill(200, 0, 0);
-            stroke(200, 0, 0)
+            noStroke()
             textSize(50);
             text("Lives left: " + abs(lives), 370, 270);
             text("Press enter to continue.", 230, 350)
