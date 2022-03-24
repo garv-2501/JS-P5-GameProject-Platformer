@@ -29,12 +29,12 @@ var isPlummeting;
      soundFormats('mp3','wav');
     
      //loading jump sound effect
-     jumpSound = loadSound('assets/Cartoon_jump_by_Bastianhallo_from_pixabay.com');
-     jumpSound.setVolume(0.1);
+     jumpSound = loadSound('assets/Cartoon_jump_by_Bastianhallo_from_pixabay.com.mp3');
+     jumpSound.setVolume(0.05);
      
      //loading background music
-     backgroundMusic = loadSound('assets/piano_moment_by_ZakharValaha_from_Pixabay.com')
-     backgroundMusic.setVolume(0.1)
+     backgroundMusic = loadSound('assets/piano_moment_by_ZakharValaha_from_Pixabay.com.mp3')
+     backgroundMusic.setVolume(0.06)
      
      //loading main game font
      chocoFont = loadFont('assets/ChocoDonut.ttf')
@@ -45,7 +45,7 @@ function setup()
 	createCanvas(1024, 576);
 	floorPos_y = 520; //yPos of the top of the ground
     lives = 3; //stores the number of lives the player has
-
+    backgroundMusic.play()
     startGame(); //contains all the arrays and objects that define all game elements
 }
 
@@ -95,13 +95,15 @@ function draw()
 
 	// Drawing the Trees
 	drawTrees();
+
+    // Drawing the Flagpole
     renderFlagpole();
     if (flagpole.isReached == false) {
         checkFlagpole();
     }
 
 	// Drawing the Canyon
-	for (i = 1; i < 3; i++) {
+	for (i = 1; i < canyons.length; i++) {
         drawCanyon(canyons[i].x,
             canyons[i].y,
             canyons[i].w,
@@ -119,15 +121,29 @@ function draw()
 	collectable.x = 260; //First line of collectable coins
     collectable.y = 400;
     for (i = 0; i < 7; i++) {
-        drawCollectables(isFound[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2);
-        checkCollectables(gameChar_world_x, gameChar_y, collectable.x, collectable.y)
+        drawCollectables(isFound1[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2);
+        checkCollectables(isFound1, gameChar_world_x, gameChar_y, collectable.x, collectable.y)
         collectable.x += 50;
     }
-    collectable.x = 1300; //Second line of collectable coins
+    collectable.x = 300; //Second line of collectable coins
     collectable.y = 330;
     for (i = 0; i < 7; i++) {
-        drawCollectables(isFound1[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2)
-        checkCollectables1(gameChar_world_x, gameChar_y, collectable.x, collectable.y)
+        drawCollectables(isFound2[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2)
+        checkCollectables(isFound2, gameChar_world_x, gameChar_y, collectable.x, collectable.y)
+        collectable.x += 50
+    }
+    collectable.x = 1300; //Third line of collectable coins
+    collectable.y = 400;
+    for (i = 0; i < 7; i++) {
+        drawCollectables(isFound3[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2);
+        checkCollectables(isFound3, gameChar_world_x, gameChar_y, collectable.x, collectable.y)
+        collectable.x += 50;
+    }
+    collectable.x = 1340; //Fourth line of collectable coins
+    collectable.y = 330;
+    for (i = 0; i < 7; i++) {
+        drawCollectables(isFound4[i], collectable.x, collectable.y, collectable.w, collectable.color1, collectable.color2)
+        checkCollectables(isFound4, gameChar_world_x, gameChar_y, collectable.x, collectable.y)
         collectable.x += 50
     }
 
@@ -216,13 +232,19 @@ function draw()
         isRight = false
     }
     
-    // Drawing the Score Board (NO.OF COINS COLLECTED)
+    // Display the Score Board (NO.OF COINS COLLECTED)
     game_score = 0;
-    for (i = 0; i < isFound.length; i++) {
-        if (isFound[i] == true) {
+    for (i = 0; i < isFound1.length; i++) {
+        if (isFound1[i] == true) {
             game_score++;
         }
-        if (isFound1[i] == true) {
+        if (isFound2[i] == true) {
+            game_score++;
+        }
+        if (isFound3[i] == true) {
+            game_score++;
+        }
+        if (isFound4[i] == true) {
             game_score++;
         }
     }
@@ -231,7 +253,7 @@ function draw()
     rect(10, 10, 160, 40);
     fill(255);
     textSize(25);
-    text("Coins: " + game_score + "/14", 25, 39);
+    text("Coins: " + game_score + "/28", 25, 39);
 
     // Display no.of lives remaining
     checkPlayerDie();
@@ -275,6 +297,7 @@ function keyPressed()
         }
     } else if (keyCode == 32) {
         isFalling = true;
+        jumpSound.play()
     }
 
     if (isPlummeting == true) {
@@ -292,13 +315,14 @@ function keyPressed()
         }
     }
 
-    if (flagpole.isReached == true && game_score == 14) {
+    if (flagpole.isReached == true && game_score == 28) {
         if (keyCode == 32) {
             lives = 3
             startGame()
         }
     }
 }
+
 function keyReleased() 
 {
     if (keyCode == LEFT_ARROW) {
@@ -696,6 +720,7 @@ function drawClouds() {
     }
     
 }
+
 // Function to draw mountains objects.
 function drawMountains() {
     noStroke();//background mountains
@@ -739,6 +764,7 @@ function drawMountains() {
     triangle(560, 310, 530, 334, 598, 338);
     triangle(850, 150, 784, 238, 905, 232);
 }
+
 // Function to draw trees objects.
 function drawTrees() {
     for (i = 0; i < trees_x.length; i++) {
@@ -770,6 +796,7 @@ function drawCanyon(x, y, w, h, c1, c2) {
         triangle(j, 576, j + 15, 560, j + 30, 576);
     }
 }
+
 // Function to check character is over a canyon.
 function checkCanyon(x, y, t_canyon_x) {
 	if (
@@ -790,8 +817,8 @@ function checkCanyon(x, y, t_canyon_x) {
 // Collectable items render and check functions
 // ----------------------------------
 // Function to draw collectable objects.
-function drawCollectables(f, x, y, w, c1, c2) {
-    if (f == false) {
+function drawCollectables(arrayElement, x, y, w, c1, c2) {
+    if (arrayElement == false) {
         fill(c2);
         ellipse(x + 2.5, y + 2.5, w);
         fill(c1);
@@ -800,15 +827,11 @@ function drawCollectables(f, x, y, w, c1, c2) {
         ellipse(x - 4, y - 4, 10);
     }
 }
+
 // Function to check character has collected an item.
-function checkCollectables(x, y, Cx, Cy) {
+function checkCollectables(array, x, y, Cx, Cy) {
     if (dist(x, y, Cx, Cy) < 30) {
-        isFound[i] = true
-    }
-}
-function checkCollectables1(x, y, Cx, Cy) {
-    if (dist(x, y, Cx, Cy) < 30) {
-        isFound1[i] = true
+        array[i] = true
     }
 }
 
@@ -825,7 +848,7 @@ function renderFlagpole() {
     fill(140)
     rect(flagpole.x_pos +10, floorPos_y - 30, 30, 20)
     rect(flagpole.x_pos, floorPos_y - 170, 10, 140)
-    if (flagpole.isReached && game_score == 14) {
+    if (flagpole.isReached && game_score == 28) {
         fill(200, 0, 0)
         triangle(flagpole.x_pos -10, floorPos_y - 70, flagpole.x_pos - 50, floorPos_y - 40, flagpole.x_pos - 10, floorPos_y - 30)
     } else {
@@ -833,12 +856,12 @@ function renderFlagpole() {
         triangle(flagpole.x_pos -10, floorPos_y - 170, flagpole.x_pos - 50, floorPos_y - 140, flagpole.x_pos - 10, floorPos_y - 130)
     }
 }
+
 // Function to check if the flagpole has been closed
 function checkFlagpole() {
     d = dist(gameChar_world_x, gameChar_y, flagpole.x_pos, floorPos_y)
-    if (d<40 && game_score ==14) {
+    if (d<40 && game_score ==28) {
         flagpole.isReached = true;
-        console.log(flagpole.isReached)
     }
 }
 
@@ -924,7 +947,7 @@ function startGame() {
             y3: 530,
         }, //foreground mountain 3
     ];
-	trees_x = [650, 780, 900];
+	trees_x = [650, 780, 900, 1300, 1440, 1580];
     trees = 
 	[
         {
@@ -936,11 +959,16 @@ function startGame() {
         { y: 300, w: 20, h: 210, d: 180 }, 
         { y: 400, w: 16, h: 110, d: 140 },
         { y: 300, w: 20, h: 210, d: 160 },
+        { y: 300, w: 20, h: 210, d: 180 }, 
+        { y: 400, w: 16, h: 110, d: 140 },
+        { y: 300, w: 20, h: 210, d: 160 },
     ];
 
     // Initialise arrays of interactable elements in the game.
-	isFound = [false, false, false, false, false, false, false];
-    isFound1 = [false, false, false, false, false, false, false];
+	isFound1 = [false, false, false, false, false, false, false];
+    isFound2 = [false, false, false, false, false, false, false];
+    isFound3 = [false, false, false, false, false, false, false];
+    isFound4 = [false, false, false, false, false, false, false];
     collectable = 
 	{
         color1: color(255, 195, 51), //main color
@@ -968,6 +996,24 @@ function startGame() {
             w: 180,
             h: 80,
         },
+        {
+            x: 1000,
+            y: 510,
+            w: 180,
+            h: 80,
+        },
+        {
+            x: 1250,
+            y: 510,
+            w: 180,
+            h: 80,
+        },
+        {
+            x: 1500,
+            y: 510,
+            w: 180,
+            h: 80,
+        },
     ];
     flagpole = {isReached: false, x_pos: 2000}
 }
@@ -988,23 +1034,24 @@ function checkPlayerDie() {
 // ---------------------------
 // Mark playing area functions
 // ---------------------------
-
 function goLeft(x) {
     var y = 430
     fill(200, 80, 80)
     noStroke()
     rect(x, y, 20, floorPos_y - y-10)
-    rect(x -60, y - 50, 140, 60)
+    rect(x -60, y - 80, 140, 90)
     fill(140, 40, 40)
-    rect(x+13, y +7, 10, floorPos_y - y-20)
-    rect(x + 80, y - 50, 10, 60)
+    rect(x+13, y +10, 10, floorPos_y - y-20)
+    rect(x + 80, y - 80, 10, 90)
 
 
     textSize(25)
     fill(200)
-    text("Go Left", x-23, y-27)
+    text("Go Left", x-23, y-55)
     textSize(30)
-    text("<--", x-8, y-2)
+    text("<--", x-8, y-30)
+    textSize(20)
+    text("Collect all the coins", x-56, y -10)
 }
 
 function goRight(x) {
@@ -1012,15 +1059,17 @@ function goRight(x) {
     fill(200, 80, 80)
     noStroke()
     rect(x, y, 20, floorPos_y - y-10)
-    rect(x -60, y - 50, 140, 60)
+    rect(x -60, y - 80, 140, 90)
     fill(140, 40, 40)
-    rect(x+13, y +7, 10, floorPos_y - y-20)
-    rect(x + 80, y - 50, 10, 60)
+    rect(x+13, y +10, 10, floorPos_y - y-20)
+    rect(x + 80, y - 80, 10, 90)
 
 
     textSize(25)
     fill(200)
-    text("Go Right", x-23, y-27)
+    text("Go Right", x-23, y-55)
     textSize(30)
-    text("-->", x-8, y-2)
+    text("-->", x-8, y-30)
+    textSize(20)
+    text("Collect all the coins", x-56, y -10)
 }
