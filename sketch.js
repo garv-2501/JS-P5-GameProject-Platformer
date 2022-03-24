@@ -5,6 +5,10 @@ const Y_AXIS = 1; //used for colour gradient function
 var chocoFont; //Font used globally
 var jumpSound; //Sound used during jump
 var backgroundMusic; //The game background music
+var fireworkSound; //The sound for fireworks
+var fireworkSound_check; //Used for playing firework sound
+var fireworks = []; //For firework presentation after a win
+var gravity; //For firework presentation after a win
 
 var gameChar_x;
 var gameChar_y;
@@ -30,11 +34,15 @@ var isPlummeting;
     
      //loading jump sound effect
      jumpSound = loadSound('assets/Cartoon_jump_by_Bastianhallo_from_pixabay.com.mp3');
-     jumpSound.setVolume(0.05);
+     jumpSound.setVolume(0.1);
      
      //loading background music
      backgroundMusic = loadSound('assets/piano_moment_by_ZakharValaha_from_Pixabay.com.mp3')
-     backgroundMusic.setVolume(0.06)
+     backgroundMusic.setVolume(0.12)
+
+     //leading firework sound effect
+     fireworkSound = loadSound('assets/Fireworks_azdudemp.mp3')
+     fireworkSound.setVolume(0.1)
      
      //loading main game font
      chocoFont = loadFont('assets/ChocoDonut.ttf')
@@ -45,6 +53,13 @@ function setup()
 	createCanvas(1024, 576);
 	floorPos_y = 520; //yPos of the top of the ground
     lives = 3; //stores the number of lives the player has
+
+    // For fireworks after a win
+    gravity = createVector(0, 0.2);
+    stroke(255);
+    strokeWeight(4);
+
+
     backgroundMusic.play()
     startGame(); //contains all the arrays and objects that define all game elements
 }
@@ -210,6 +225,7 @@ function draw()
         text("Game over. You Lose! ", 265, 270);
         text("Press space to continue.", 250, 350)
     }else if (isPlummeting) {
+        jumpSound.stop()
         if (lives > -3 && lives < 3) {
             fill(0, 100)
             rect(0, 0, width, height)
@@ -222,6 +238,16 @@ function draw()
     }else if (flagpole.isReached == true) {
         fill(0, 100)
         rect(0, 0, width, height)
+
+        //firework and firework sounds
+        push()
+        renderFirework()
+        if (fireworkSound_check == true) {
+            fireworkSound.play()
+            fireworkSound_check = false
+        }
+        pop()
+
         fill(0, 250, 0);
         noStroke()
         textSize(60);
@@ -230,6 +256,7 @@ function draw()
         isFalling = false
         isLeft = false
         isRight = false
+        
     }
     
     // Display the Score Board (NO.OF COINS COLLECTED)
@@ -296,8 +323,11 @@ function keyPressed()
             scroll = true;
         }
     } else if (keyCode == 32) {
+        fireworkSound.stop()
         isFalling = true;
-        jumpSound.play()
+        if (gameChar_y >= floorPos_y - 15) {
+            jumpSound.play()
+        }
     }
 
     if (isPlummeting == true) {
@@ -869,8 +899,9 @@ function checkFlagpole() {
 function startGame() {
     gameChar_x = 140;
 	gameChar_y = floorPos_y - 10;
-	vel_x = 4;
-	vel_y = 10;
+	vel_x = 4; //game character x velocity
+	vel_y = 10; //game character y velocity
+    fireworkSound_check = true; //Used for firework sounds
     
 
 	// Variable to control the background scrolling.
@@ -1073,3 +1104,19 @@ function goRight(x) {
     textSize(20)
     text("Collect all the coins", x-56, y -10)
 }
+
+function renderFirework() {
+    if (random(1) < 0.03) {
+        fireworks.push(new Firework());
+    }
+    
+    for (var i = fireworks.length - 1; i >= 0; i--) {
+        fireworks[i].update();
+        fireworks[i].show();
+    
+        if (fireworks[i].done()) {
+            fireworks.splice(i, 1);
+        }
+    }
+}
+
