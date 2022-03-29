@@ -1,4 +1,22 @@
+// COMMENT ON THE EXTENSION I HAVE USED
+//I have used "Add sounds as my extension" paired with "add graphics"
+//--------------------------------------------------------------------
 
+// COMMENT ON THE BITS YOU FOUND DIFFICULT
+// Reflecting on the past, I can think of many instances were I had to sit for hours thinking 
+// about how I am going to add a perticular feature or solve that specific bug. I would say it happened
+// to me while adding almost every feature that this game has. Although, the one difficulty that 
+// persisted for a long time organizing and keeping track of the bigger picture when
+// your code becomes huge. The logical bugs you face just amplifies in difficulty when you have to go 
+// through everything trying to understand in detail the 1000 lines of code you have.
+//--------------------------------------------------------------------
+
+// COMMENT ON THE SKILLS YOU LEARNT/PRACTICED BY IMPLEMENTING IT
+// I have learnt a lot about javascript and p5.js but the most important thing I gained is a strong understanding
+// of how programming works. This venture has tought me a lot about programming from learning 
+// the basics about programming such as variables, conditionals, loops, functions, etc to making
+// me understand the deeper concepts about organizing the code, use of comments and using my intuitions
+// to make complex things from just the basics tools.
 
 
 const Y_AXIS = 1; //used for colour gradient function
@@ -59,8 +77,6 @@ function setup()
     stroke(255);
     strokeWeight(4);
 
-
-    backgroundMusic.play()
     startGame(); //contains all the arrays and objects that define all game elements
 }
 
@@ -303,8 +319,10 @@ function draw()
 // 4: Background render functions, (clouds, mountains, trees)                #
 // 5: Canyon render and check functions                                      #
 // 6: Collectable items render and check functions                           #
-// 7: Function that holds all the arrays and objects for all game elements   #
-// 8: Function to check if player has died                                   #
+// 7: Flagpole render and check function                                     #
+// 8: StartGame function that holds all the arrays and objects               #
+// 9: Function to check if player has died                                   #
+// 10: Go left and go right board function                                   #
 //############################################################################
 
 
@@ -916,6 +934,11 @@ function startGame() {
 	isRight = false;
 	isFalling = false;
 	isPlummeting = false;
+
+    // background music play
+    if (backgroundMusic.isPlaying() == false) {
+        backgroundMusic.play()
+    } 
 
 	// Initialise arrays of non interactable elements in the game.
 	sky = 

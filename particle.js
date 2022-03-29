@@ -1,6 +1,7 @@
-// This code is from: Daniel Shiffman
-// Github: https://github.com/CodingTrain
-// Code for: https://youtu.be/CKeyIbT3vXI
+// This code is from: Daniel Shiffman (The Coding Train)
+// Inspired by youtube video from Coding train: https://youtu.be/CKeyIbT3vXI
+
+// Used to make the particles that are then used by the fireworks
 
 function Particle(x, y, hu, firework) {
     this.pos = createVector(x, y);

@@ -1,7 +1,9 @@
-// This code is from: Daniel Shiffman
-// Github: https://github.com/CodingTrain
-// Code for: https://youtu.be/CKeyIbT3vXI
+// This code is from: Daniel Shiffman (The Coding Train)
+// Inspired by youtube video from Coding train: https://youtu.be/CKeyIbT3vXI
 
+// Used to make fireworks if the player winds
+
+// this function is used to create the fireworks. Takes no arguments
 function Firework() {
     this.hu = random(255);
     this.firework = new Particle(random(width), height, this.hu, true);
